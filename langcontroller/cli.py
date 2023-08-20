@@ -7,9 +7,6 @@ Features
 
 TODO Write Doc Strings for AI
 
-TODO FastAPI
-TODO manage.py runs the FastAPI Server and maybe the CLI
-
 TODO BasePrompt feature
 TODO Middleware
 TODO Tests
@@ -226,8 +223,9 @@ class MAKE:
 
         template = env.get_template("prompt_command_with_source.jinja2")
         my_prompt = template.render(dict(
-            target_action=target_action.human_name(),
-            source_action=source_action.human_name()
+            source_action_underscore_name=source_action.underscore_name(),
+            source_action_human_name=source_action.human_name(),
+            target_action=target_action.human_name()
         ))
         with open(f"prompt_templates/{prompt_name}.jinja2", "w") as f:
             f.write(my_prompt)

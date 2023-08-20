@@ -1,8 +1,10 @@
-from rich import print
 import typer
+from fastapi import FastAPI
+from rich import print
 from langcontroller.controllers import *
 from models import *
 
+api_app = FastAPI()
 
-app = typer.Typer(rich_markup_mode="rich")
+cli_app = typer.Typer(rich_markup_mode="rich")
 
