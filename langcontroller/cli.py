@@ -230,7 +230,6 @@ class MAKE:
             source_action=source_action.human_name()
         ))
         with open(f"prompt_templates/{prompt_name}.jinja2", "w") as f:
-            f.write("\n\n")
             f.write(my_prompt)
 
         template = env.get_template("models_class.jinja2")
