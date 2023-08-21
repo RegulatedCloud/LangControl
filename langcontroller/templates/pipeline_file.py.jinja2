@@ -1,0 +1,12 @@
+"""pipeline.py
+
+This module contains the important assets of the {{ project_name }} project that
+are used to build the Dagster Pipeline
+"""
+from dagster import (
+    asset,
+    get_dagster_logger,
+    AssetExecutionContext,
+)
+from commands import *
+

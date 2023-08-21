@@ -1,0 +1,18 @@
+"""components.py
+
+This module contains the important components of the {{ project_name }} project, such as the
+FastAPI application and the CLI application.
+
+Components wrap the controllers and models, and are used to provide a clean
+interface to the developer.
+"""
+import typer
+from fastapi import FastAPI
+from rich import print
+from langcontroller.controllers import *
+from models import *
+
+api_app = FastAPI()
+
+cli_app = typer.Typer(rich_markup_mode="rich")
+
