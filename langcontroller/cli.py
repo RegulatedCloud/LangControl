@@ -1,4 +1,7 @@
-"""A Generative AI Python Application Framework inspired by Django, Laravel, and Meltano
+"""A Generative AI Python Application Framework
+
+Inspiration:
+    Django, Laravel, and Meltano
 
 Features:
     Architected for both Human and AI Devs
@@ -38,7 +41,7 @@ class Renamer:
         Example:
             scaled-agile-framework -> Scaled Agile Framework
         """
-        return self.slug.replace('-', ' ').title()
+        return self.slug.replace("-", " ").title()
 
     def python_name(self):
         """Return a python name from a slug
@@ -46,7 +49,7 @@ class Renamer:
         Example:
             scaled-agile-framework -> ScaledAgileFramework
         """
-        return self.human_name().replace(' ', '')
+        return self.human_name().replace(" ", "")
 
     def underscore_name(self):
         """Return an underscore name from a slug
@@ -54,7 +57,7 @@ class Renamer:
         Example:
             scaled-agile-framework -> scaled_agile_framework
         """
-        return self.slug.replace('-', '_')
+        return self.slug.replace("-", "_")
 
 
 class Commandify:
@@ -81,7 +84,7 @@ class Commandify:
             3. Decorate the class method with "app.command"
 
         Args:
-            cls (class): The class to decorate class methods into a typer repository
+            cls (class): The class to add decorators to
         """
         for attr_name, attr_value in vars(cls).items():
             if callable(attr_value) and attr_name.startswith("do_"):
@@ -89,8 +92,7 @@ class Commandify:
                 attribute_name = slugify(attr_name[3:])
                 new_name = f"{cls_name}-{attribute_name}"
                 new_command = app.command(
-                    name=new_name,
-                    rich_help_panel=self.help_panel_name
+                    name=new_name, rich_help_panel=self.help_panel_name
                 )
                 setattr(cls, attr_name, new_command(attr_value))
         return cls
@@ -102,7 +104,7 @@ def about():
     print("LangController is like Django but for LLM Applications")
 
 
-@Commandify(help_panel_name='Make Commands')
+@Commandify(help_panel_name="Make Commands")
 class MAKE:
     """Make Commands
 
@@ -141,9 +143,7 @@ class MAKE:
             autoescape=select_autoescape(),
         )
         template = env.get_template("pyproject/create_pyproject_file.toml.j2")
-        file_contents = template.render(dict(
-            project_name=project.python_name()
-        ))
+        file_contents = template.render(dict(project_name=project.python_name()))
         with open(f"{project.python_name()}/pyproject.toml", "w") as f:
             f.write(file_contents)
 
@@ -153,16 +153,12 @@ class MAKE:
             f.write(file_contents)
 
         template = env.get_template("models/create_models_file.py.j2")
-        file_contents = template.render(
-            project_name=project.human_name()
-        )
+        file_contents = template.render(project_name=project.human_name())
         with open(f"{project.python_name()}/app/models.py", "w") as f:
             f.write(file_contents)
 
         template = env.get_template("repository/create_repository_file.py.j2")
-        file_contents = template.render(
-            project_name=project.human_name()
-        )
+        file_contents = template.render(project_name=project.human_name())
         with open(f"{project.python_name()}/app/repository.py", "w") as f:
             f.write(file_contents)
 
@@ -172,34 +168,36 @@ class MAKE:
             f.write(file_contents)
 
         template = env.get_template("pipeline/create_pipeline_file.py.j2")
-        file_contents = template.render(dict(
-            project_name=project.human_name()
-        ))
+        file_contents = template.render(dict(project_name=project.human_name()))
         with open(f"{project.python_name()}/app/pipeline.py", "w") as f:
             f.write(file_contents)
 
     @staticmethod
-    def do_sensor(target_action: str, attribute_1: str, attribute_2: str, attribute_3: str):
+    def do_sensor(
+        target_action: str, attribute_1: str, attribute_2: str, attribute_3: str
+    ):
         """Create a new LangController Feature from inside your LangController Project
 
         Args:
             target_action (str): The name of the outgoing target
-            attribute_1 (str): The name of the first attribute of the target action
-            attribute_2 (str): The name of the second attribute of the target action
-            attribute_3 (str): The name of the third attribute of the target action
+            attribute_1 (str): The name of the first attribute
+            attribute_2 (str): The name of the second attribute
+            attribute_3 (str): The name of the third attribute
 
         Example:
             langcontroller make-sensor strategy mission vision values
             python manage.py create_strategy "Tour Operator for the Moon"
         """
 
-        if not all([
-            os.path.exists("app/models.py"),
-            os.path.exists("app/pipeline.py"),
-            os.path.exists("app/repository.py"),
-            os.path.exists("manage.py"),
-            os.path.exists("templates"),
-        ]):
+        if not all(
+            [
+                os.path.exists("app/models.py"),
+                os.path.exists("app/pipeline.py"),
+                os.path.exists("app/repository.py"),
+                os.path.exists("manage.py"),
+                os.path.exists("templates"),
+            ]
+        ):
             print("Please verify that you are in a LangController Project")
             return
 
@@ -218,69 +216,86 @@ class MAKE:
         prompt_name = f"{target_action.slug}"
 
         template = env.get_template("prompt_templates/create_sensor_file.j2.j2")
-        my_prompt = template.render(dict(
-            target_action=target_action.human_name(),
-        ))
+        my_prompt = template.render(
+            dict(
+                target_action=target_action.human_name(),
+            )
+        )
         with open(f"templates/{prompt_name}.j2", "w") as f:
             f.write(my_prompt)
 
         template = env.get_template("models/append_marvin_class.py.j2")
-        my_model = template.render(dict(
-            target_action_human_name=target_action.human_name(),
-            target_action_python_name=target_action.python_name(),
-            attribute_1_name=attribute_1.underscore_name(),
-            attribute_2_name=attribute_2.underscore_name(),
-            attribute_3_name=attribute_3.underscore_name(),
-        ))
+        my_model = template.render(
+            dict(
+                target_action_human_name=target_action.human_name(),
+                target_action_python_name=target_action.python_name(),
+                attribute_1_name=attribute_1.underscore_name(),
+                attribute_2_name=attribute_2.underscore_name(),
+                attribute_3_name=attribute_3.underscore_name(),
+            )
+        )
         with open("app/models.py", "a") as f:
             f.write("\n\n")
             f.write(my_model)
 
         template = env.get_template("repository/append_sensor_class.py.j2")
-        my_function = template.render(dict(
-            target_action_human_name=target_action.human_name(),
-            target_action_python_name=target_action.python_name(),
-            target_action_underscore_name=target_action.underscore_name(),
-            prompt_name=prompt_name,
-            controller_type="Marvin",
-        ))
+        my_function = template.render(
+            dict(
+                target_action_human_name=target_action.human_name(),
+                target_action_python_name=target_action.python_name(),
+                target_action_underscore_name=target_action.underscore_name(),
+                prompt_name=prompt_name,
+                controller_type="Marvin",
+            )
+        )
         with open("app/repository.py", "a") as f:
             f.write("\n\n")
             f.write(my_function)
 
         template = env.get_template("pipeline/append_sensor_function.py.j2")
-        my_asset = template.render(dict(
-            target_action_human_name=target_action.human_name(),
-            target_action_underscore_name=target_action.underscore_name(),
-        ))
+        my_asset = template.render(
+            dict(
+                target_action_human_name=target_action.human_name(),
+                target_action_underscore_name=target_action.underscore_name(),
+            )
+        )
         with open("app/pipeline.py", "a") as f:
             f.write("\n\n")
             f.write(my_asset)
 
     @staticmethod
-    def do_asset(source_action: str, target_action: str,
-                 attribute_1: str, attribute_2: str, attribute_3: str):
+    def do_asset(
+        source_action: str,
+        target_action: str,
+        attribute_1: str,
+        attribute_2: str,
+        attribute_3: str,
+    ):
         """Create a new LangController Feature from inside your LangController Project
 
         Args:
             source_action (str): The name of the in coming source
             target_action (str): The name of the outgoing target
-            attribute_1 (str): The name of the first attribute of the target action
-            attribute_2 (str): The name of the second attribute of the target action
-            attribute_3 (str): The name of the third attribute of the target action
+            attribute_1 (str): The name of the first attribute
+            attribute_2 (str): The name of the second attribute
+            attribute_3 (str): The name of the third attribute
 
         Example:
-            langcontroller make-asset strategy scaled-agile-portfolio name description issues
-            python manage.py create_scaled_agile_portfolio "Award-winning Tour Operator for the Moon"
+            langcontroller make-asset strategy scaled-agile-portfolio \
+                name description issues
+            python manage.py create_scaled_agile_portfolio \
+                "Award-winning Tour Operator for the Moon"
         """
 
-        if not all([
-            os.path.exists("app/models.py"),
-            os.path.exists("app/pipeline.py"),
-            os.path.exists("app/repository.py"),
-            os.path.exists("templates"),
-            os.path.exists("manage.py"),
-        ]):
+        if not all(
+            [
+                os.path.exists("app/models.py"),
+                os.path.exists("app/pipeline.py"),
+                os.path.exists("app/repository.py"),
+                os.path.exists("templates"),
+                os.path.exists("manage.py"),
+            ]
+        ):
             print("Please verify that you are in a LangController Project")
             return
 
@@ -300,46 +315,54 @@ class MAKE:
         prompt_name = f"{source_action.slug}-to-{target_action.slug}"
 
         template = env.get_template("prompt_templates/create_asset_file.j2.j2")
-        my_prompt = template.render(dict(
-            source_action_underscore_name=source_action.underscore_name(),
-            source_action_human_name=source_action.human_name(),
-            target_action=target_action.human_name()
-        ))
+        my_prompt = template.render(
+            dict(
+                source_action_underscore_name=source_action.underscore_name(),
+                source_action_human_name=source_action.human_name(),
+                target_action=target_action.human_name(),
+            )
+        )
         with open(f"templates/{prompt_name}.j2", "w") as f:
             f.write(my_prompt)
 
         template = env.get_template("models/append_marvin_class.py.j2")
-        my_model = template.render(dict(
-            target_action_human_name=target_action.human_name(),
-            target_action_python_name=target_action.python_name(),
-            attribute_1_name=attribute_1.underscore_name(),
-            attribute_2_name=attribute_2.underscore_name(),
-            attribute_3_name=attribute_3.underscore_name(),
-        ))
+        my_model = template.render(
+            dict(
+                target_action_human_name=target_action.human_name(),
+                target_action_python_name=target_action.python_name(),
+                attribute_1_name=attribute_1.underscore_name(),
+                attribute_2_name=attribute_2.underscore_name(),
+                attribute_3_name=attribute_3.underscore_name(),
+            )
+        )
         with open("app/models.py", "a") as f:
             f.write("\n\n")
             f.write(my_model)
 
         template = env.get_template("repository/append_asset_class.py.j2")
-        my_function = template.render(dict(
-            source_action_underscore_name=source_action.underscore_name(),
-            target_action_human_name=target_action.human_name(),
-            target_action_python_name=target_action.python_name(),
-            target_action_underscore_name=target_action.underscore_name(),
-            prompt_name=prompt_name,
-            controller_type="Marvin",
-        ))
+        my_function = template.render(
+            dict(
+                source_action_underscore_name=source_action.underscore_name(),
+                target_action_human_name=target_action.human_name(),
+                target_action_python_name=target_action.python_name(),
+                target_action_underscore_name=target_action.underscore_name(),
+                prompt_name=prompt_name,
+                controller_type="Marvin",
+            )
+        )
         with open("app/repository.py", "a") as f:
             f.write("\n\n")
             f.write(my_function)
 
         template = env.get_template("pipeline/append_asset_function.py.j2")
-        my_asset = template.render(dict(
-            source_action_human_name=source_action.human_name(),
-            source_action_underscore_name=source_action.underscore_name(),
-            target_action_human_name=target_action.human_name(),
-            target_action_underscore_name=target_action.underscore_name(),
-        ))
+        my_asset = template.render(
+            dict(
+                source_action_human_name=source_action.human_name(),
+                source_action_underscore_name=source_action.underscore_name(),
+                target_action_human_name=target_action.human_name(),
+                target_action_underscore_name=target_action.underscore_name(),
+            )
+        )
         with open("app/pipeline.py", "a") as f:
             f.write("\n\n")
             f.write(my_asset)
