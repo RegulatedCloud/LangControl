@@ -13,7 +13,7 @@ class GenericPromptTemplateMixin:
     """Mixin for prompting and applying middlewares to the prompt_template"""
 
     env = Environment(
-        loader=FileSystemLoader("prompt_templates"),
+        loader=FileSystemLoader("templates"),
         autoescape=select_autoescape(),
     )
 
@@ -36,7 +36,7 @@ class GenericPromptTemplateMixin:
         Returns:
             str: The rendered prompt_template
         """
-        template = self.env.get_template(f"{prompt_template}.jinja2")
+        template = self.env.get_template(f"{prompt_template}.j2")
         return template.render(**kwargs)
 
     def apply_prompt_middleware(self, prompt: str) -> str:

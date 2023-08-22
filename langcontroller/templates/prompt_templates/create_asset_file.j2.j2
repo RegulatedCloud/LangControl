@@ -1,2 +1,6 @@
+{% raw %}{% extends "base_prompt.j2" %}
+
+{% block prompt %}{% endraw %}
 Create a {{ target_action }} given the following {{ source_action_human_name }}:
 {% raw %}{{{% endraw %} {{ source_action_underscore_name }} {% raw %}}}{% endraw %}
+{% raw %}{% endblock %} {% endraw %}

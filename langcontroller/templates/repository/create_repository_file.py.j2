@@ -1,16 +1,21 @@
-"""components.py
+"""Repository Services
 
-This module contains the important components of the {{ project_name }} project, such as the
-FastAPI application and the CLI application.
+This module contains the important repository services of the {{ project_name }} project,
+such as the FastAPI application and the CLI application.
 
 Components wrap the controllers and models, and are used to provide a clean
 interface to the developer.
+
+Patterns:
+    Repository-Pattern
+    Decorator-Pattern
+
 """
 import typer
 from fastapi import FastAPI
 from rich import print
 from langcontroller.controllers import *
-from models import *
+from app.models import *
 
 api_app = FastAPI()
 

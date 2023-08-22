@@ -1,16 +1,16 @@
-"""
-A Generative AI Python Application Framework inspired by Django, Laravel, and Meltano
+"""A Generative AI Python Application Framework inspired by Django, Laravel, and Meltano
 
-Features
+Features:
     Architected for both Human and AI Devs
     Scaffolds are designed to help your AI Code Assistant
     Generated components render with CLI, FastAPI, and Dagster
 
-TODO BasePrompt feature
-TODO migrate commands to components
-TODO migrate cli.py to manage.py
-TODO Middleware
-TODO Tests
+Template Naming Conventions:
+    <domain>_<operation>_<data_type>
+    domain - manage|models|pipeline|prompt_templates|pyproject|repository
+    operation - append|create
+    data_type - asset|class|function|file|prompt|sensor
+
 """
 import os
 
@@ -69,19 +69,19 @@ class Commandify:
         self.help_panel_name = help_panel_name
 
     def __call__(self, cls):
-        """Convert methods in a class into a typer commands
+        """Convert methods in a class into a typer repository
 
         Setup Steps:
-            1. Decorate Class with Commandify
-            2. Decorate Classmethods with @staticmethod
+            1. Decorate class with Commandify
+            2. Decorate class methods with @staticmethod
 
         Commandify Steps:
-            1. Find all classmethods that start with "do_"
-            2. Convert the classmethod name to a slug
-            3. Decorate the classmethod with typer.command
+            1. Find all class methods that start with "do_"
+            2. Convert the class method name to a slug
+            3. Decorate the class method with "app.command"
 
         Args:
-            cls (class): The class to decorate classmethods into a typer commands
+            cls (class): The class to decorate class methods into a typer repository
         """
         for attr_name, attr_value in vars(cls).items():
             if callable(attr_value) and attr_name.startswith("do_"):
@@ -126,8 +126,11 @@ class MAKE:
 
         project = Renamer(slug=project_name)
         os.mkdir(project.python_name())
-        os.mkdir(f"{project.python_name()}/prompt_templates")
-        f = open(f"{project.python_name()}/prompt_templates/__init__.py", "w")
+        os.mkdir(f"{project.python_name()}/app")
+        f = open(f"{project.python_name()}/app/__init__.py", "w")
+        f.close()
+        os.mkdir(f"{project.python_name()}/templates")
+        f = open(f"{project.python_name()}/templates/__init__.py", "w")
         f.close()
 
         script_path = os.path.realpath(__file__)
@@ -137,58 +140,65 @@ class MAKE:
             loader=FileSystemLoader(f"{script_dir}/templates"),
             autoescape=select_autoescape(),
         )
-        template = env.get_template("pyproject_file.toml.jinja2")
+        template = env.get_template("pyproject/create_pyproject_file.toml.j2")
         file_contents = template.render(dict(
             project_name=project.python_name()
         ))
         with open(f"{project.python_name()}/pyproject.toml", "w") as f:
             f.write(file_contents)
 
-        template = env.get_template("models_file.py.jinja2")
-        file_contents = template.render(
-            project_name=project.human_name()
-        )
-        with open(f"{project.python_name()}/models.py", "w") as f:
-            f.write(file_contents)
-
-        template = env.get_template("command_file.py.jinja2")
-        file_contents = template.render(
-            project_name=project.human_name()
-        )
-        with open(f"{project.python_name()}/commands.py", "w") as f:
-            f.write(file_contents)
-
-        template = env.get_template("cli_file.jinja2")
+        template = env.get_template("prompt_templates/create_prompt-base_file.j2.j2")
         file_contents = template.render()
-        with open(f"{project.python_name()}/cli.py", "w") as f:
+        with open(f"{project.python_name()}/templates/base_prompt.j2", "w") as f:
             f.write(file_contents)
 
-        template = env.get_template("pipeline_file.py.jinja2")
+        template = env.get_template("models/create_models_file.py.j2")
+        file_contents = template.render(
+            project_name=project.human_name()
+        )
+        with open(f"{project.python_name()}/app/models.py", "w") as f:
+            f.write(file_contents)
+
+        template = env.get_template("repository/create_repository_file.py.j2")
+        file_contents = template.render(
+            project_name=project.human_name()
+        )
+        with open(f"{project.python_name()}/app/repository.py", "w") as f:
+            f.write(file_contents)
+
+        template = env.get_template("manage/create_manage_file.py.j2")
+        file_contents = template.render()
+        with open(f"{project.python_name()}/manage.py", "w") as f:
+            f.write(file_contents)
+
+        template = env.get_template("pipeline/create_pipeline_file.py.j2")
         file_contents = template.render(dict(
             project_name=project.human_name()
         ))
-        with open(f"{project.python_name()}/pipeline.py", "w") as f:
+        with open(f"{project.python_name()}/app/pipeline.py", "w") as f:
             f.write(file_contents)
 
     @staticmethod
-    def do_feature_no_source(target_action: str, attribute_1: str, attribute_2: str, attribute_3: str):
+    def do_sensor(target_action: str, attribute_1: str, attribute_2: str, attribute_3: str):
         """Create a new LangController Feature from inside your LangController Project
 
         Args:
-            target_action (str): The name of the out going target
+            target_action (str): The name of the outgoing target
             attribute_1 (str): The name of the first attribute of the target action
             attribute_2 (str): The name of the second attribute of the target action
             attribute_3 (str): The name of the third attribute of the target action
 
         Example:
-            langcontroller make-feature-no-input strategy mission vision values
-            poetry run python commands.py create_strategy "Tour Operator for the Moon"
+            langcontroller make-sensor strategy mission vision values
+            python manage.py create_strategy "Tour Operator for the Moon"
         """
 
         if not all([
-            os.path.exists("commands.py"),
-            os.path.exists("pipeline.py"),
-            os.path.exists("prompt_templates"),
+            os.path.exists("app/models.py"),
+            os.path.exists("app/pipeline.py"),
+            os.path.exists("app/repository.py"),
+            os.path.exists("manage.py"),
+            os.path.exists("templates"),
         ]):
             print("Please verify that you are in a LangController Project")
             return
@@ -207,14 +217,14 @@ class MAKE:
         )
         prompt_name = f"{target_action.slug}"
 
-        template = env.get_template("prompt_command_no_source.jinja2")
+        template = env.get_template("prompt_templates/create_sensor_file.j2.j2")
         my_prompt = template.render(dict(
             target_action=target_action.human_name(),
         ))
-        with open(f"prompt_templates/{prompt_name}.jinja2", "w") as f:
+        with open(f"templates/{prompt_name}.j2", "w") as f:
             f.write(my_prompt)
 
-        template = env.get_template("models_class.jinja2")
+        template = env.get_template("models/append_marvin_class.py.j2")
         my_model = template.render(dict(
             target_action_human_name=target_action.human_name(),
             target_action_python_name=target_action.python_name(),
@@ -222,11 +232,11 @@ class MAKE:
             attribute_2_name=attribute_2.underscore_name(),
             attribute_3_name=attribute_3.underscore_name(),
         ))
-        with open("models.py", "a") as f:
+        with open("app/models.py", "a") as f:
             f.write("\n\n")
             f.write(my_model)
 
-        template = env.get_template("command_function_no_source.jinja2")
+        template = env.get_template("repository/append_sensor_class.py.j2")
         my_function = template.render(dict(
             target_action_human_name=target_action.human_name(),
             target_action_python_name=target_action.python_name(),
@@ -234,40 +244,42 @@ class MAKE:
             prompt_name=prompt_name,
             controller_type="Marvin",
         ))
-        with open("commands.py", "a") as f:
+        with open("app/repository.py", "a") as f:
             f.write("\n\n")
             f.write(my_function)
 
-        template = env.get_template("pipeline_function_no_source.jinja2")
+        template = env.get_template("pipeline/append_sensor_function.py.j2")
         my_asset = template.render(dict(
             target_action_human_name=target_action.human_name(),
             target_action_underscore_name=target_action.underscore_name(),
         ))
-        with open("pipeline.py", "a") as f:
+        with open("app/pipeline.py", "a") as f:
             f.write("\n\n")
             f.write(my_asset)
 
     @staticmethod
-    def do_feature_with_source(source_action: str, target_action: str, attribute_1: str, attribute_2: str,
-                               attribute_3: str):
+    def do_asset(source_action: str, target_action: str,
+                 attribute_1: str, attribute_2: str, attribute_3: str):
         """Create a new LangController Feature from inside your LangController Project
 
         Args:
-            source_action (str): The name of the in comming source
-            target_action (str): The name of the out going target
+            source_action (str): The name of the in coming source
+            target_action (str): The name of the outgoing target
             attribute_1 (str): The name of the first attribute of the target action
             attribute_2 (str): The name of the second attribute of the target action
             attribute_3 (str): The name of the third attribute of the target action
 
         Example:
-            langcontroller make-feature-with-source strategy scaled-agile-portfolio name description issues
-            poetry run python commands.py create_scaled_agile_portfolio --strategy "Tour Operator for the Moon"
+            langcontroller make-asset strategy scaled-agile-portfolio name description issues
+            python manage.py create_scaled_agile_portfolio "Award-winning Tour Operator for the Moon"
         """
 
         if not all([
-            os.path.exists("commands.py"),
-            os.path.exists("pipeline.py"),
-            os.path.exists("prompt_templates"),
+            os.path.exists("app/models.py"),
+            os.path.exists("app/pipeline.py"),
+            os.path.exists("app/repository.py"),
+            os.path.exists("templates"),
+            os.path.exists("manage.py"),
         ]):
             print("Please verify that you are in a LangController Project")
             return
@@ -287,16 +299,16 @@ class MAKE:
         )
         prompt_name = f"{source_action.slug}-to-{target_action.slug}"
 
-        template = env.get_template("prompt_command_with_source.jinja2")
+        template = env.get_template("prompt_templates/create_asset_file.j2.j2")
         my_prompt = template.render(dict(
             source_action_underscore_name=source_action.underscore_name(),
             source_action_human_name=source_action.human_name(),
             target_action=target_action.human_name()
         ))
-        with open(f"prompt_templates/{prompt_name}.jinja2", "w") as f:
+        with open(f"templates/{prompt_name}.j2", "w") as f:
             f.write(my_prompt)
 
-        template = env.get_template("models_class.jinja2")
+        template = env.get_template("models/append_marvin_class.py.j2")
         my_model = template.render(dict(
             target_action_human_name=target_action.human_name(),
             target_action_python_name=target_action.python_name(),
@@ -304,11 +316,11 @@ class MAKE:
             attribute_2_name=attribute_2.underscore_name(),
             attribute_3_name=attribute_3.underscore_name(),
         ))
-        with open("models.py", "a") as f:
+        with open("app/models.py", "a") as f:
             f.write("\n\n")
             f.write(my_model)
 
-        template = env.get_template("command_function_with_source.jinja2")
+        template = env.get_template("repository/append_asset_class.py.j2")
         my_function = template.render(dict(
             source_action_underscore_name=source_action.underscore_name(),
             target_action_human_name=target_action.human_name(),
@@ -317,18 +329,18 @@ class MAKE:
             prompt_name=prompt_name,
             controller_type="Marvin",
         ))
-        with open("commands.py", "a") as f:
+        with open("app/repository.py", "a") as f:
             f.write("\n\n")
             f.write(my_function)
 
-        template = env.get_template("pipeline_function_with_source.jinja2")
+        template = env.get_template("pipeline/append_asset_function.py.j2")
         my_asset = template.render(dict(
             source_action_human_name=source_action.human_name(),
             source_action_underscore_name=source_action.underscore_name(),
             target_action_human_name=target_action.human_name(),
             target_action_underscore_name=target_action.underscore_name(),
         ))
-        with open("pipeline.py", "a") as f:
+        with open("app/pipeline.py", "a") as f:
             f.write("\n\n")
             f.write(my_asset)
 

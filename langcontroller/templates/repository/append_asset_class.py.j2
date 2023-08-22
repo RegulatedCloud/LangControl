@@ -1,6 +1,7 @@
-@api_app.post("/{{ target_action_underscore_name }}")
+@api_app.post("{{ target_action_underscore_name }}")
 @cli_app.command()
-def create_{{ target_action_underscore_name }}({{ source_action_underscore_name }}: str) -> {{ target_action_python_name }}:
+def create_{{ target_action_underscore_name }}(
+           {{ source_action_underscore_name }}: str) -> {{ target_action_python_name }}:
     """Creates a {{ target_action_human_name }}"""
     print("Creating {{ target_action_human_name }}...")
 
