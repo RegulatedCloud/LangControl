@@ -2,6 +2,7 @@
 def {{ target_action_underscore_name }}(context: AssetExecutionContext) -> str:
     """Creates a {{ target_action_human_name }}."""
     logger = get_dagster_logger()
+    logger.info("Starting {{ target_action_human_name }}...")
 
     my_{{ target_action_underscore_name }} = create_{{ target_action_underscore_name }}()
 

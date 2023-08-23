@@ -1,10 +1,14 @@
 @asset
-def {{ target_action_underscore_name }}(context: AssetExecutionContext, {{ source_action_underscore_name }}: str) -> str:
+def {{ target_action_underscore_name }}(
+    context: AssetExecutionContext, {{ source_action_underscore_name }}: str
+) -> str:
     """Creates a {{ target_action_human_name }}."""
     logger = get_dagster_logger()
     logger.info(f"{{ source_action_human_name }}: {% raw %}{{% endraw %}{{ source_action_underscore_name }}{% raw %}}{% endraw %}")
 
-    my_{{ target_action_underscore_name }} = create_{{ target_action_underscore_name }}({{ source_action_underscore_name }}={{ source_action_underscore_name }})
+    my_{{ target_action_underscore_name }} = create_{{ target_action_underscore_name }}(
+        {{ source_action_underscore_name }}={{ source_action_underscore_name }}
+    )
 
     context.add_output_metadata(
         metadata={

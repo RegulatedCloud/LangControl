@@ -15,6 +15,7 @@ Template Naming Conventions:
     data_type - asset|class|function|file|prompt|sensor
 """
 import os
+from typing import Dict
 
 from rich import print
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -97,6 +98,52 @@ class Commandify:
         return cls
 
 
+class TemplateWriter:
+    """Renders Jinja2 templates and writes them to files."""
+
+    def __init__(self, template_folder: str):
+        """Initialize TemplateWriter with a template folder."""
+        self.env = Environment(
+            loader=FileSystemLoader(template_folder),
+            autoescape=select_autoescape(),
+        )
+
+    def render_and_write(
+        self,
+        template_file: str,
+        output_file: str,
+        context: Dict[str, str],
+        write_mode="w",
+    ) -> None:
+        """Renders a Jinja2 template and writes it to an output file.
+
+        Args:
+            template_file (str): The name of the template file
+            output_file (str): The name of the output file
+            context (Dict[str, str]): The context to render the template with
+            write_mode (str): The write mode to use when writing to the file
+        """
+        try:
+            template = self.env.get_template(template_file)
+        except Exception as e:
+            print(f"Error loading template: {e}")
+            return
+
+        try:
+            file_contents = template.render(context)
+        except Exception as e:
+            print(f"Error rendering template: {e}")
+            return
+
+        try:
+            with open(output_file, write_mode) as my_file:
+                if write_mode == "a":
+                    my_file.write("\n\n")
+                my_file.write(file_contents)
+        except Exception as e:
+            print(f"Error writing to output file: {e}")
+
+
 @app.command(rich_help_panel=BASIC_COMMANDS)
 def about():
     """About LangController."""
@@ -110,6 +157,23 @@ class MAKE:
     Make Commands are used to scaffold new LangController Projects and
     Features
     """
+
+    def __init__(self, template_writer: TemplateWriter):
+        """Initialize MAKE with a TemplateWriter."""
+        self.template_writer = template_writer
+
+    @staticmethod
+    def create_skeleton(project: Renamer):
+        """Create a new LangController Project Skeleton."""
+        os.mkdir(project.python_name())
+
+        os.mkdir(f"{project.python_name()}/app")
+        with open(f"{project.python_name()}/app/__init__.py", "w") as my_file:
+            my_file.write(f'"""{project.human_name()} App Components."""\n')
+
+        os.mkdir(f"{project.python_name()}/templates")
+        with open(f"{project.python_name()}/templates/__init__.py", "w") as my_file:
+            my_file.write(f'"""{project.human_name()} Templates."""\n')
 
     @staticmethod
     def do_project(project_name: str):
@@ -127,50 +191,66 @@ class MAKE:
             return
 
         project = Renamer(slug=project_name)
-        os.mkdir(project.python_name())
-        os.mkdir(f"{project.python_name()}/app")
-        f = open(f"{project.python_name()}/app/__init__.py", "w")
-        f.close()
-        os.mkdir(f"{project.python_name()}/templates")
-        f = open(f"{project.python_name()}/templates/__init__.py", "w")
-        f.close()
+        MAKE.create_skeleton(project)
 
         script_path = os.path.realpath(__file__)
         script_dir = os.path.dirname(script_path)
 
-        env = Environment(
-            loader=FileSystemLoader(f"{script_dir}/templates"),
-            autoescape=select_autoescape(),
+        template_writer = TemplateWriter(template_folder=f"{script_dir}/templates")
+
+        template_writer.render_and_write(
+            template_file="top_level/create_pyproject_file.toml.j2",
+            output_file=f"{project.python_name()}/pyproject.toml",
+            context=dict(project_name=project.python_name()),
         )
-        template = env.get_template("pyproject/create_pyproject_file.toml.j2")
-        file_contents = template.render(dict(project_name=project.python_name()))
-        with open(f"{project.python_name()}/pyproject.toml", "w") as f:
-            f.write(file_contents)
 
-        template = env.get_template("prompt_templates/create_prompt-base_file.j2.j2")
-        file_contents = template.render()
-        with open(f"{project.python_name()}/templates/base_prompt.j2", "w") as f:
-            f.write(file_contents)
+        template_writer.render_and_write(
+            template_file="top_level/create_precommit_file.yaml.j2",
+            output_file=f"{project.python_name()}/.pre-commit-config.yaml",
+            context=dict(),
+        )
 
-        template = env.get_template("models/create_models_file.py.j2")
-        file_contents = template.render(project_name=project.human_name())
-        with open(f"{project.python_name()}/app/models.py", "w") as f:
-            f.write(file_contents)
+        template_writer.render_and_write(
+            template_file="top_level/create_tox_file.ini.j2",
+            output_file=f"{project.python_name()}/tox.ini",
+            context=dict(),
+        )
 
-        template = env.get_template("repository/create_repository_file.py.j2")
-        file_contents = template.render(project_name=project.human_name())
-        with open(f"{project.python_name()}/app/repository.py", "w") as f:
-            f.write(file_contents)
+        template_writer.render_and_write(
+            template_file="top_level/create_gitignore_file.gitignore.j2",
+            output_file=f"{project.python_name()}/.gitignore",
+            context=dict(),
+        )
 
-        template = env.get_template("manage/create_manage_file.py.j2")
-        file_contents = template.render()
-        with open(f"{project.python_name()}/manage.py", "w") as f:
-            f.write(file_contents)
+        template_writer.render_and_write(
+            template_file="prompt_templates/create_prompt-base_file.j2.j2",
+            output_file=f"{project.python_name()}/templates/base_prompt.j2",
+            context=dict(),
+        )
 
-        template = env.get_template("pipeline/create_pipeline_file.py.j2")
-        file_contents = template.render(dict(project_name=project.human_name()))
-        with open(f"{project.python_name()}/app/pipeline.py", "w") as f:
-            f.write(file_contents)
+        template_writer.render_and_write(
+            template_file="models/create_models_file.py.j2",
+            output_file=f"{project.python_name()}/app/models.py",
+            context=dict(project_name=project.human_name()),
+        )
+
+        template_writer.render_and_write(
+            template_file="repository/create_repository_file.py.j2",
+            output_file=f"{project.python_name()}/app/repository.py",
+            context=dict(project_name=project.human_name()),
+        )
+
+        template_writer.render_and_write(
+            template_file="manage/create_manage_file.py.j2",
+            output_file=f"{project.python_name()}/manage.py",
+            context=dict(),
+        )
+
+        template_writer.render_and_write(
+            template_file="pipeline/create_pipeline_file.py.j2",
+            output_file=f"{project.python_name()}/app/pipeline.py",
+            context=dict(project_name=project.human_name()),
+        )
 
     @staticmethod
     def do_sensor(
@@ -207,60 +287,51 @@ class MAKE:
 
         script_path = os.path.realpath(__file__)
         script_dir = os.path.dirname(script_path)
-
-        env = Environment(
-            loader=FileSystemLoader(f"{script_dir}/templates"),
-            autoescape=select_autoescape(),
-        )
         prompt_name = f"{target_action.slug}"
 
-        template = env.get_template("prompt_templates/create_sensor_file.j2.j2")
-        my_prompt = template.render(
-            dict(
-                target_action=target_action.human_name(),
-            )
-        )
-        with open(f"templates/{prompt_name}.j2", "w") as f:
-            f.write(my_prompt)
+        template_writer = TemplateWriter(template_folder=f"{script_dir}/templates")
 
-        template = env.get_template("models/append_marvin_class.py.j2")
-        my_model = template.render(
-            dict(
+        template_writer.render_and_write(
+            template_file="prompt_templates/create_sensor_file.j2.j2",
+            output_file=f"templates/{prompt_name}.j2",
+            context=dict(target_action=target_action.human_name()),
+        )
+
+        template_writer.render_and_write(
+            template_file="models/append_marvin_class.py.j2",
+            output_file="app/models.py",
+            context=dict(
                 target_action_human_name=target_action.human_name(),
                 target_action_python_name=target_action.python_name(),
                 attribute_1_name=attribute_1.underscore_name(),
                 attribute_2_name=attribute_2.underscore_name(),
                 attribute_3_name=attribute_3.underscore_name(),
-            )
+            ),
+            write_mode="a",
         )
-        with open("app/models.py", "a") as f:
-            f.write("\n\n")
-            f.write(my_model)
 
-        template = env.get_template("repository/append_sensor_class.py.j2")
-        my_function = template.render(
-            dict(
+        template_writer.render_and_write(
+            template_file="repository/append_sensor_class.py.j2",
+            output_file="app/repository.py",
+            context=dict(
                 target_action_human_name=target_action.human_name(),
                 target_action_python_name=target_action.python_name(),
                 target_action_underscore_name=target_action.underscore_name(),
                 prompt_name=prompt_name,
                 controller_type="Marvin",
-            )
+            ),
+            write_mode="a",
         )
-        with open("app/repository.py", "a") as f:
-            f.write("\n\n")
-            f.write(my_function)
 
-        template = env.get_template("pipeline/append_sensor_function.py.j2")
-        my_asset = template.render(
-            dict(
+        template_writer.render_and_write(
+            template_file="pipeline/append_sensor_function.py.j2",
+            output_file="app/pipeline.py",
+            context=dict(
                 target_action_human_name=target_action.human_name(),
                 target_action_underscore_name=target_action.underscore_name(),
-            )
+            ),
+            write_mode="a",
         )
-        with open("app/pipeline.py", "a") as f:
-            f.write("\n\n")
-            f.write(my_asset)
 
     @staticmethod
     def do_asset(
@@ -305,65 +376,58 @@ class MAKE:
 
         script_path = os.path.realpath(__file__)
         script_dir = os.path.dirname(script_path)
-
-        env = Environment(
-            loader=FileSystemLoader(f"{script_dir}/templates"),
-            autoescape=select_autoescape(),
-        )
         prompt_name = f"{source_action.slug}-to-{target_action.slug}"
 
-        template = env.get_template("prompt_templates/create_asset_file.j2.j2")
-        my_prompt = template.render(
-            dict(
+        template_writer = TemplateWriter(template_folder=f"{script_dir}/templates")
+
+        template_writer.render_and_write(
+            template_file="prompt_templates/create_asset_file.j2.j2",
+            output_file=f"templates/{prompt_name}.j2",
+            context=dict(
                 source_action_underscore_name=source_action.underscore_name(),
                 source_action_human_name=source_action.human_name(),
                 target_action=target_action.human_name(),
-            )
+            ),
         )
-        with open(f"templates/{prompt_name}.j2", "w") as f:
-            f.write(my_prompt)
 
-        template = env.get_template("models/append_marvin_class.py.j2")
-        my_model = template.render(
-            dict(
+        template_writer.render_and_write(
+            template_file="models/append_marvin_class.py.j2",
+            output_file="app/models.py",
+            context=dict(
                 target_action_human_name=target_action.human_name(),
                 target_action_python_name=target_action.python_name(),
                 attribute_1_name=attribute_1.underscore_name(),
                 attribute_2_name=attribute_2.underscore_name(),
                 attribute_3_name=attribute_3.underscore_name(),
-            )
+            ),
+            write_mode="a",
         )
-        with open("app/models.py", "a") as f:
-            f.write("\n\n")
-            f.write(my_model)
 
-        template = env.get_template("repository/append_asset_class.py.j2")
-        my_function = template.render(
-            dict(
+        template_writer.render_and_write(
+            template_file="repository/append_asset_class.py.j2",
+            output_file="app/repository.py",
+            context=dict(
                 source_action_underscore_name=source_action.underscore_name(),
                 target_action_human_name=target_action.human_name(),
                 target_action_python_name=target_action.python_name(),
                 target_action_underscore_name=target_action.underscore_name(),
                 prompt_name=prompt_name,
                 controller_type="Marvin",
-            )
+            ),
+            write_mode="a",
         )
-        with open("app/repository.py", "a") as f:
-            f.write("\n\n")
-            f.write(my_function)
 
-        template = env.get_template("pipeline/append_asset_function.py.j2")
-        my_asset = template.render(
-            dict(
+        template_writer.render_and_write(
+            template_file="pipeline/append_asset_function.py.j2",
+            output_file="app/pipeline.py",
+            context=dict(
                 source_action_human_name=source_action.human_name(),
                 source_action_underscore_name=source_action.underscore_name(),
                 target_action_human_name=target_action.human_name(),
                 target_action_underscore_name=target_action.underscore_name(),
-            )
+            ),
+            write_mode="a",
         )
-        with open("app/pipeline.py", "a") as f:
-            f.write("\n\n")
-            f.write(my_asset)
 
 
 if __name__ == "__main__":
