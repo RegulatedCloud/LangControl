@@ -3,14 +3,13 @@
 MarvinAI specific Mixins for prompting and applying middlewares to the
 prompt_template and output model
 """
-from typing import List, Callable, Any, TypeVar
+from typing import List, Callable, Any
 
+from langcontroller.controllers.structs import OutputModel
 from langcontroller.controllers.generic import (
     GenericPromptTemplateMixin,
     GenericStructuredOutputMixin,
 )
-
-OutputModel = TypeVar("OutputModel")
 
 
 class MarvinStructuredOutputController(

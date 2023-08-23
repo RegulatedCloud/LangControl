@@ -3,10 +3,10 @@
 The Generic Mixins are used to provide a common interface for the
 prompt_template and output model.
 """
-from typing import List, Callable, Any, Optional, TypeVar
+from typing import List, Callable, Any, Optional
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-OutputModel = TypeVar("OutputModel")
+from langcontroller.controllers.structs import OutputModel
 
 
 class GenericPromptTemplateMixin:
