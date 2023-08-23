@@ -12,7 +12,7 @@ langcontroller = "langcontroller:app"
 [tool.poetry.dependencies]
 python = "^3.10"
 jinja2 = "^3.1.2"
-typer = {extras = ["all"], version = "^0.9.0"}
+typer = { extras = ["all"], version = "^0.9.0" }
 python-slugify = "^8.0.1"
 
 [tool.poetry.group.marvin.dependencies]
@@ -22,10 +22,15 @@ marvin = "^1.3.0"
 pytest = "^7.4.0"
 black = "^23.7.0"
 hypothesis = "^6.82.6"
+docformatter = "^1.7.5"
 
 [tool.poetry.group.dagster.dependencies]
 dagster = "^1.4.7"
 dagster-webserver = "^1.4.7"
+
+[tool.docformatter]
+recursive = true
+blank = true
 
 [build-system]
 requires = ["poetry-core"]

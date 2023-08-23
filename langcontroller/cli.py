@@ -1,4 +1,4 @@
-"""A Generative AI Python Application Framework
+"""A Generative AI Python Application Framework.
 
 Inspiration:
     Django, Laravel, and Meltano
@@ -29,50 +29,54 @@ BASIC_COMMANDS = "Basic Commands"
 
 
 class Renamer:
-    """Rename a string to a slug, python name, or human name"""
+    """Rename a string to a slug, python name, or human name."""
 
     def __init__(self, slug: str):
-        """Initialize Renamer with a slug"""
+        """Initialize Renamer with a slug."""
         self.slug = slugify(slug)
 
     def human_name(self):
-        """Return a human name from a slug
+        """Return a human name from a slug.
 
         Example:
             scaled-agile-framework -> Scaled Agile Framework
+
         """
         return self.slug.replace("-", " ").title()
 
     def python_name(self):
-        """Return a python name from a slug
+        """Return a python name from a slug.
 
         Example:
             scaled-agile-framework -> ScaledAgileFramework
+
         """
         return self.human_name().replace(" ", "")
 
     def underscore_name(self):
-        """Return an underscore name from a slug
+        """Return an underscore name from a slug.
 
         Example:
             scaled-agile-framework -> scaled_agile_framework
+
         """
         return self.slug.replace("-", "_")
 
 
 class Commandify:
-    """Decorator to convert a class into a typer command"""
+    """Decorator to convert a class into a typer command."""
 
     def __init__(self, help_panel_name: str):
-        """Initialize Commandify with a help panel name
+        """Initialize Commandify with a help panel name.
 
         Args:
             help_panel_name (str): The name of the typer help panel
+
         """
         self.help_panel_name = help_panel_name
 
     def __call__(self, cls):
-        """Convert methods in a class into a typer repository
+        """Convert methods in a class into a typer repository.
 
         Setup Steps:
             1. Decorate class with Commandify
@@ -85,6 +89,7 @@ class Commandify:
 
         Args:
             cls (class): The class to add decorators to
+
         """
         for attr_name, attr_value in vars(cls).items():
             if callable(attr_value) and attr_name.startswith("do_"):
@@ -100,20 +105,22 @@ class Commandify:
 
 @app.command(rich_help_panel=BASIC_COMMANDS)
 def about():
-    """About LangController"""
+    """About LangController."""
     print("LangController is like Django but for LLM Applications")
 
 
 @Commandify(help_panel_name="Make Commands")
 class MAKE:
-    """Make Commands
+    """Make Commands.
 
-    Make Commands are used to scaffold new LangController Projects and Features
+    Make Commands are used to scaffold new LangController Projects and
+    Features
+
     """
 
     @staticmethod
     def do_project(project_name: str):
-        """Create a new LangController Project
+        """Create a new LangController Project.
 
         Args:
             project_name (str): The name of the new LangController Project
@@ -121,6 +128,7 @@ class MAKE:
         Example:
             langcontroller make-project scaled-agile-framework
             cd ScaledAgileFramework
+
         """
         if os.path.exists(project_name):
             print(f"Project {project_name} already exists")
@@ -176,7 +184,8 @@ class MAKE:
     def do_sensor(
         target_action: str, attribute_1: str, attribute_2: str, attribute_3: str
     ):
-        """Create a new LangController Feature from inside your LangController Project
+        """Create a new LangController Feature from inside your LangController
+        Project.
 
         Args:
             target_action (str): The name of the outgoing target
@@ -187,6 +196,7 @@ class MAKE:
         Example:
             langcontroller make-sensor strategy mission vision values
             python manage.py create_strategy "Tour Operator for the Moon"
+
         """
 
         if not all(
@@ -271,7 +281,8 @@ class MAKE:
         attribute_2: str,
         attribute_3: str,
     ):
-        """Create a new LangController Feature from inside your LangController Project
+        """Create a new LangController Feature from inside your LangController
+        Project.
 
         Args:
             source_action (str): The name of the in coming source
@@ -285,6 +296,7 @@ class MAKE:
                 name description issues
             python manage.py create_scaled_agile_portfolio \
                 "Award-winning Tour Operator for the Moon"
+
         """
 
         if not all(

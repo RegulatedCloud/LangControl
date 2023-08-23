@@ -1,11 +1,15 @@
-"""marvin.py
+"""marvin.py.
 
-MarvinAI specific Mixins for prompting and applying middlewares to the prompt_template and output model
+MarvinAI specific Mixins for prompting and applying middlewares to the
+prompt_template and output model
 
 """
 from typing import List, Callable, Any, TypeVar
 
-from langcontroller.controllers.generic import GenericPromptTemplateMixin, GenericStructuredOutputMixin
+from langcontroller.controllers.generic import (
+    GenericPromptTemplateMixin,
+    GenericStructuredOutputMixin,
+)
 
 OutputModel = TypeVar("OutputModel")
 
@@ -13,18 +17,20 @@ OutputModel = TypeVar("OutputModel")
 class MarvinStructuredOutputController(
     GenericPromptTemplateMixin, GenericStructuredOutputMixin
 ):
-    """A MarvinAI specific Mixin for prompting and applying middlewares to the prompt_template and output model"""
+    """A MarvinAI specific Mixin for prompting and applying middlewares to the
+    prompt_template and output model."""
 
     def __init__(
-            self,
-            output_model: Callable[[Any], OutputModel],
-            prompt_template: str = None,
+        self,
+        output_model: Callable[[Any], OutputModel],
+        prompt_template: str = None,
     ):
-        """Initialize the MarvinStructuredOutputController
+        """Initialize the MarvinStructuredOutputController.
 
         Args:
-            output_model (Callable[[Any], OutputModel]): The structured output model based on Pydantic
-            prompt_template (str, optional): The jinja2 template to use for the llm prompt. Defaults to None.
+            output_model (Callable[[Any], OutputModel]): The structured pydantic output model
+            prompt_template (str, optional): The jinja2 template to use for the llm prompt
+
         """
         super().__init__()
         self.output_model = output_model
@@ -35,13 +41,14 @@ class MarvinStructuredOutputController(
         self.output_middlewares: List[Callable] = []
 
     def apply(self, **kwargs) -> OutputModel:
-        """Apply middlewares to the context, prompt_template, and output model
+        """Apply middlewares to the context, prompt_template, and output model.
 
         Args:
             **kwargs: The context to apply to the jinja2 template for the llm prompt_template
 
         Returns:
             OutputModel: The populated structured output model based on Pydantic
+
         """
         context = self.apply_context_middleware(**kwargs)
 
