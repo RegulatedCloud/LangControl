@@ -1,6 +1,6 @@
 @asset
 def {{ target_action_underscore_name }}(context: AssetExecutionContext, {{ source_action_underscore_name }}: str) -> str:
-    """Creates a {{ target_action_human_name }}"""
+    """Creates a {{ target_action_human_name }}."""
     logger = get_dagster_logger()
     logger.info(f"{{ source_action_human_name }}: {% raw %}{{% endraw %}{{ source_action_underscore_name }}{% raw %}}{% endraw %}")
 

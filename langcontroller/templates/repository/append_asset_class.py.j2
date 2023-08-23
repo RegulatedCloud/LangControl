@@ -2,7 +2,7 @@
 @cli_app.command()
 def create_{{ target_action_underscore_name }}(
            {{ source_action_underscore_name }}: str) -> {{ target_action_python_name }}:
-    """Creates a {{ target_action_human_name }}"""
+    """Creates a {{ target_action_human_name }}."""
     print("Creating {{ target_action_human_name }}...")
 
     model: {{ target_action_python_name }} = {{ controller_type }}StructuredOutputController(
