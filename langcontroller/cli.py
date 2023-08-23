@@ -13,7 +13,6 @@ Template Naming Conventions:
     domain - manage|models|pipeline|prompt_templates|pyproject|repository
     operation - append|create
     data_type - asset|class|function|file|prompt|sensor
-
 """
 import os
 
@@ -40,7 +39,6 @@ class Renamer:
 
         Example:
             scaled-agile-framework -> Scaled Agile Framework
-
         """
         return self.slug.replace("-", " ").title()
 
@@ -49,7 +47,6 @@ class Renamer:
 
         Example:
             scaled-agile-framework -> ScaledAgileFramework
-
         """
         return self.human_name().replace(" ", "")
 
@@ -58,7 +55,6 @@ class Renamer:
 
         Example:
             scaled-agile-framework -> scaled_agile_framework
-
         """
         return self.slug.replace("-", "_")
 
@@ -71,7 +67,6 @@ class Commandify:
 
         Args:
             help_panel_name (str): The name of the typer help panel
-
         """
         self.help_panel_name = help_panel_name
 
@@ -89,7 +84,6 @@ class Commandify:
 
         Args:
             cls (class): The class to add decorators to
-
         """
         for attr_name, attr_value in vars(cls).items():
             if callable(attr_value) and attr_name.startswith("do_"):
@@ -115,7 +109,6 @@ class MAKE:
 
     Make Commands are used to scaffold new LangController Projects and
     Features
-
     """
 
     @staticmethod
@@ -128,7 +121,6 @@ class MAKE:
         Example:
             langcontroller make-project scaled-agile-framework
             cd ScaledAgileFramework
-
         """
         if os.path.exists(project_name):
             print(f"Project {project_name} already exists")
@@ -184,8 +176,7 @@ class MAKE:
     def do_sensor(
         target_action: str, attribute_1: str, attribute_2: str, attribute_3: str
     ):
-        """Create a new LangController Feature from inside your LangController
-        Project.
+        """Create a new LangController Feature for your LangController Project.
 
         Args:
             target_action (str): The name of the outgoing target
@@ -196,9 +187,7 @@ class MAKE:
         Example:
             langcontroller make-sensor strategy mission vision values
             python manage.py create_strategy "Tour Operator for the Moon"
-
         """
-
         if not all(
             [
                 os.path.exists("app/models.py"),
@@ -281,8 +270,7 @@ class MAKE:
         attribute_2: str,
         attribute_3: str,
     ):
-        """Create a new LangController Feature from inside your LangController
-        Project.
+        """Create a new LangController Feature for your LangController Project.
 
         Args:
             source_action (str): The name of the in coming source
@@ -296,9 +284,7 @@ class MAKE:
                 name description issues
             python manage.py create_scaled_agile_portfolio \
                 "Award-winning Tour Operator for the Moon"
-
         """
-
         if not all(
             [
                 os.path.exists("app/models.py"),

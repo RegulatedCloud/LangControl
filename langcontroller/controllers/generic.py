@@ -1,8 +1,7 @@
-"""generic.py.
+"""Generic Mixins.
 
-Generic Mixins for prompting and applying middlewares to the
-prompt_template and output model
-
+The Generic Mixins are used to provide a common interface for the
+prompt_template and output model.
 """
 from typing import List, Callable, Any, Optional, TypeVar
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -23,7 +22,6 @@ class GenericPromptTemplateMixin:
 
         Args:
             prompt_template (str, optional): The jinja2 template to use for the llm prompt
-
         """
         self.prompt_middlewares: List[Callable] = []
         self.prompt_template = prompt_template
@@ -37,7 +35,6 @@ class GenericPromptTemplateMixin:
 
         Returns:
             str: The rendered prompt_template
-
         """
         template = self.env.get_template(f"{prompt_template}.j2")
         return template.render(**kwargs)
@@ -50,7 +47,6 @@ class GenericPromptTemplateMixin:
 
         Returns:
             str: The rendered prompt_template that has been procesed by the middlewares
-
         """
         for middleware in self.prompt_middlewares:
             prompt = middleware(prompt)
@@ -64,7 +60,6 @@ class GenericPromptTemplateMixin:
 
         Returns:
             str: The rendered prompt_template that has been procesed by the middlewares
-
         """
         context = self.apply_prompt_middleware(prompt=context)
         prompt = self.get_rendered_prompt(prompt_template=self.prompt_template)
@@ -78,8 +73,7 @@ class GenericPromptTemplateMixin:
 
 
 class GenericStructuredOutputMixin:
-    """Mixin for prompting and applying middlewares to the prompt_template and
-    output model."""
+    """Mixin for structured outputs."""
 
     def __init__(
         self,
@@ -91,7 +85,6 @@ class GenericStructuredOutputMixin:
         Args:
             output_model (Callable[[Any], OutputModel]): The structured pydantic output model
             prompt_template (str, optional): The jinja2 template to use for the llm prompt
-
         """
         self.output_model = output_model
         self.prompt = prompt_template
@@ -107,7 +100,6 @@ class GenericStructuredOutputMixin:
 
         Returns:
             {}: The context that has been procesed by the middlewares
-
         """
         context = {}
         for middleware in self.context_middlewares:
@@ -122,7 +114,6 @@ class GenericStructuredOutputMixin:
 
         Returns:
             OutputModel: The output model that has been procesed by the middlewares
-
         """
         for middleware in self.model_middlewares:
             output = middleware(output)
@@ -140,7 +131,6 @@ class GenericStructuredOutputMixin:
 
         Returns:
             OutputModel: The output model that has been procesed by the middlewares
-
         """
         if self.output_middlewares is not None:
             for middleware in self.output_middlewares:

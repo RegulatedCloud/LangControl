@@ -23,14 +23,11 @@ pytest = "^7.4.0"
 black = "^23.7.0"
 hypothesis = "^6.82.6"
 docformatter = "^1.7.5"
+pydocstyle = {extras = ["toml"], version = "^6.3.0"}
 
 [tool.poetry.group.dagster.dependencies]
 dagster = "^1.4.7"
 dagster-webserver = "^1.4.7"
-
-[tool.docformatter]
-recursive = true
-blank = true
 
 [build-system]
 requires = ["poetry-core"]

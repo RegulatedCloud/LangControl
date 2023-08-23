@@ -1,3 +1,4 @@
+"""Main entry point for the application script."""
 import sys
 from langcontroller.cli import app
 

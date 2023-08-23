@@ -2,7 +2,6 @@
 
 MarvinAI specific Mixins for prompting and applying middlewares to the
 prompt_template and output model
-
 """
 from typing import List, Callable, Any, TypeVar
 
@@ -17,8 +16,7 @@ OutputModel = TypeVar("OutputModel")
 class MarvinStructuredOutputController(
     GenericPromptTemplateMixin, GenericStructuredOutputMixin
 ):
-    """A MarvinAI specific Mixin for prompting and applying middlewares to the
-    prompt_template and output model."""
+    """A MarvinAI specific Mixin for structured output."""
 
     def __init__(
         self,
@@ -30,7 +28,6 @@ class MarvinStructuredOutputController(
         Args:
             output_model (Callable[[Any], OutputModel]): The structured pydantic output model
             prompt_template (str, optional): The jinja2 template to use for the llm prompt
-
         """
         super().__init__()
         self.output_model = output_model
@@ -48,7 +45,6 @@ class MarvinStructuredOutputController(
 
         Returns:
             OutputModel: The populated structured output model based on Pydantic
-
         """
         context = self.apply_context_middleware(**kwargs)
 

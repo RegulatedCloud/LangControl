@@ -1,0 +1,1 @@
+"""LangController Middleware."""
