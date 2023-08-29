@@ -15,6 +15,8 @@ Template Naming Conventions:
     data_type - asset|class|function|file|prompt|sensor
 """
 import os
+from enum import Enum
+from typing_extensions import Annotated
 
 from rich import print
 
@@ -25,6 +27,13 @@ from langcontroller.utils import Renamer, TemplateWriter, Commandify
 app = typer.Typer(rich_markup_mode="rich")
 
 BASIC_COMMANDS = "Basic Commands"
+
+
+class ControllerTypes(Enum):
+    """LLM Controller Types."""
+
+    LLAMA = "Llama"
+    MARVIN = "Marvin"
 
 
 @app.command(rich_help_panel=BASIC_COMMANDS)
@@ -151,106 +160,29 @@ class MAKE:
         )
 
     @staticmethod
-    def do_sensor(
-        target_action: str, attribute_1: str, attribute_2: str, attribute_3: str
-    ):
-        """Create a new LangController Feature for your LangController Project.
-
-        Args:
-            target_action (str): The name of the outgoing target
-            attribute_1 (str): The name of the first attribute
-            attribute_2 (str): The name of the second attribute
-            attribute_3 (str): The name of the third attribute
-
-        Example:
-            langcontroller make-sensor strategy mission vision values
-            python manage.py create_strategy "Tour Operator for the Moon"
-        """
-        if not all(
-            [
-                os.path.exists("app/models.py"),
-                os.path.exists("app/pipeline.py"),
-                os.path.exists("app/features.py"),
-                os.path.exists("manage.py"),
-                os.path.exists("templates"),
-            ]
-        ):
-            print("Please verify that you are in a LangController Project")
-            return
-
-        target_action = Renamer(slug=target_action)
-        attribute_1 = Renamer(slug=attribute_1)
-        attribute_2 = Renamer(slug=attribute_2)
-        attribute_3 = Renamer(slug=attribute_3)
-
-        script_path = os.path.realpath(__file__)
-        script_dir = os.path.dirname(script_path)
-        prompt_name = f"{target_action.slug}"
-
-        template_writer = TemplateWriter(template_folder=f"{script_dir}/templates")
-
-        template_writer.render_and_write(
-            template_file="prompt_templates/create_sensor_file.j2.j2",
-            output_file=f"templates/{prompt_name}.j2",
-            context=dict(target_action=target_action.human_name()),
-        )
-
-        template_writer.render_and_write(
-            template_file="models/append_marvin_class.py.j2",
-            output_file="app/models.py",
-            context=dict(
-                target_action_human_name=target_action.human_name(),
-                target_action_python_name=target_action.python_name(),
-                attribute_1_name=attribute_1.underscore_name(),
-                attribute_2_name=attribute_2.underscore_name(),
-                attribute_3_name=attribute_3.underscore_name(),
-            ),
-            write_mode="a",
-        )
-
-        template_writer.render_and_write(
-            template_file="features/append_sensor_class.py.j2",
-            output_file="app/features.py",
-            context=dict(
-                target_action_human_name=target_action.human_name(),
-                target_action_python_name=target_action.python_name(),
-                target_action_underscore_name=target_action.underscore_name(),
-                prompt_name=prompt_name,
-                controller_type="Marvin",
-            ),
-            write_mode="a",
-        )
-
-        template_writer.render_and_write(
-            template_file="pipeline/append_sensor_function.py.j2",
-            output_file="app/pipeline.py",
-            context=dict(
-                target_action_human_name=target_action.human_name(),
-                target_action_underscore_name=target_action.underscore_name(),
-            ),
-            write_mode="a",
-        )
-
-    @staticmethod
     def do_asset(
-        source_action: str,
-        target_action: str,
-        attribute_1: str,
-        attribute_2: str,
-        attribute_3: str,
+        source_action: Annotated[str, typer.Option()] = "",
+        target_action: Annotated[str, typer.Option()] = "Strategy",
+        target_attr_1: Annotated[str, typer.Option()] = "mission",
+        target_attr_2: Annotated[str, typer.Option()] = "vision",
+        target_attr_3: Annotated[str, typer.Option()] = "values",
     ):
         """Create a new LangController Feature for your LangController Project.
 
         Args:
             source_action (str): The name of the in coming source
             target_action (str): The name of the outgoing target
-            attribute_1 (str): The name of the first attribute
-            attribute_2 (str): The name of the second attribute
-            attribute_3 (str): The name of the third attribute
+            target_attr_1 (str): The name of the first attribute
+            target_attr_2 (str): The name of the second attribute
+            target_attr_3 (str): The name of the third attribute
 
         Example:
-            langcontroller make-asset strategy scaled-agile-portfolio \
-                name description issues
+            langcontroller make-asset --source_action strategy \
+                --target_action scaled-agile-portfolio \
+                --target_attr_1 name \
+                --target_attr_2 description \
+                --target_attr_3 issues
+
             python manage.py create_scaled_agile_portfolio \
                 "Award-winning Tour Operator for the Moon"
         """
@@ -268,25 +200,18 @@ class MAKE:
 
         source_action = Renamer(slug=source_action)
         target_action = Renamer(slug=target_action)
-        attribute_1 = Renamer(slug=attribute_1)
-        attribute_2 = Renamer(slug=attribute_2)
-        attribute_3 = Renamer(slug=attribute_3)
+        target_attr_1 = Renamer(slug=target_attr_1)
+        target_attr_2 = Renamer(slug=target_attr_2)
+        target_attr_3 = Renamer(slug=target_attr_3)
 
         script_path = os.path.realpath(__file__)
         script_dir = os.path.dirname(script_path)
-        prompt_name = f"{source_action.slug}-to-{target_action.slug}"
+        if source_action.slug != "":
+            prompt_name = f"{source_action.slug}-to-{target_action.slug}"
+        else:
+            prompt_name = f"{target_action.slug}"
 
         template_writer = TemplateWriter(template_folder=f"{script_dir}/templates")
-
-        template_writer.render_and_write(
-            template_file="prompt_templates/create_asset_file.j2.j2",
-            output_file=f"templates/{prompt_name}.j2",
-            context=dict(
-                source_action_underscore_name=source_action.underscore_name(),
-                source_action_human_name=source_action.human_name(),
-                target_action=target_action.human_name(),
-            ),
-        )
 
         template_writer.render_and_write(
             template_file="models/append_marvin_class.py.j2",
@@ -294,39 +219,81 @@ class MAKE:
             context=dict(
                 target_action_human_name=target_action.human_name(),
                 target_action_python_name=target_action.python_name(),
-                attribute_1_name=attribute_1.underscore_name(),
-                attribute_2_name=attribute_2.underscore_name(),
-                attribute_3_name=attribute_3.underscore_name(),
+                target_attr_1_name=target_attr_1.underscore_name(),
+                target_attr_2_name=target_attr_2.underscore_name(),
+                target_attr_3_name=target_attr_3.underscore_name(),
             ),
             write_mode="a",
         )
 
-        template_writer.render_and_write(
-            template_file="features/append_asset_class.py.j2",
-            output_file="app/features.py",
-            context=dict(
-                source_action_underscore_name=source_action.underscore_name(),
-                source_action_python_name=source_action.python_name(),
-                target_action_human_name=target_action.human_name(),
-                target_action_python_name=target_action.python_name(),
-                target_action_underscore_name=target_action.underscore_name(),
-                prompt_name=prompt_name,
-                controller_type="Marvin",
-            ),
-            write_mode="a",
-        )
+        if source_action.slug != "":
+            template_writer.render_and_write(
+                template_file="prompt_templates/create_asset-with-source_file.j2.j2",
+                output_file=f"templates/{prompt_name}.j2",
+                context=dict(
+                    source_action_underscore_name=source_action.underscore_name(),
+                    source_action_human_name=source_action.human_name(),
+                    target_action=target_action.human_name(),
+                ),
+            )
 
-        template_writer.render_and_write(
-            template_file="pipeline/append_asset_function.py.j2",
-            output_file="app/pipeline.py",
-            context=dict(
-                source_action_human_name=source_action.human_name(),
-                source_action_underscore_name=source_action.underscore_name(),
-                target_action_human_name=target_action.human_name(),
-                target_action_underscore_name=target_action.underscore_name(),
-            ),
-            write_mode="a",
-        )
+            template_writer.render_and_write(
+                template_file="features/append_asset-with-source_class.py.j2",
+                output_file="app/features.py",
+                context=dict(
+                    source_action_underscore_name=source_action.underscore_name(),
+                    source_action_python_name=source_action.python_name(),
+                    target_action_human_name=target_action.human_name(),
+                    target_action_python_name=target_action.python_name(),
+                    target_action_underscore_name=target_action.underscore_name(),
+                    prompt_name=prompt_name,
+                    controller_type=ControllerTypes.MARVIN.value,
+                ),
+                write_mode="a",
+            )
+
+            template_writer.render_and_write(
+                template_file="pipeline/append_asset-with-source_function.py.j2",
+                output_file="app/pipeline.py",
+                context=dict(
+                    source_action_human_name=source_action.human_name(),
+                    source_action_underscore_name=source_action.underscore_name(),
+                    target_action_human_name=target_action.human_name(),
+                    target_action_underscore_name=target_action.underscore_name(),
+                ),
+                write_mode="a",
+            )
+
+        else:
+            template_writer.render_and_write(
+                template_file="prompt_templates/create_asset-no-source_file.j2.j2",
+                output_file=f"templates/{prompt_name}.j2",
+                context=dict(
+                    target_action=target_action.human_name(),
+                ),
+            )
+            template_writer.render_and_write(
+                template_file="features/append_asset-no-source_class.py.j2",
+                output_file="app/features.py",
+                context=dict(
+                    target_action_human_name=target_action.human_name(),
+                    target_action_python_name=target_action.python_name(),
+                    target_action_underscore_name=target_action.underscore_name(),
+                    prompt_name=prompt_name,
+                    controller_type=ControllerTypes.MARVIN.value,
+                ),
+                write_mode="a",
+            )
+
+            template_writer.render_and_write(
+                template_file="pipeline/append_asset-no-source_function.py.j2",
+                output_file="app/pipeline.py",
+                context=dict(
+                    target_action_human_name=target_action.human_name(),
+                    target_action_underscore_name=target_action.underscore_name(),
+                ),
+                write_mode="a",
+            )
 
 
 if __name__ == "__main__":

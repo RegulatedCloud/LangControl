@@ -9,7 +9,7 @@ from typing import Callable, TypeVar, Any
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 OutputModel = TypeVar("OutputModel")
-OutputModelStrategy = Callable[[Any], OutputModel]
+OutputModelStrategy = Callable[[Any], OutputModel] | OutputModel
 
 
 @dataclass
