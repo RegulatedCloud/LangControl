@@ -1,8 +1,7 @@
 @asset
 def {{ target_action_underscore_name }}(context: AssetExecutionContext) -> str:
     """Creates a {{ target_action_human_name }}."""
-    logger = get_dagster_logger()
-    logger.info(f"Materializing {{ target_action_human_name }}...")
+    context.log.info("Materializing {{ target_action_human_name }}...")
 
     my_{{ target_action_underscore_name }} = create_{{ target_action_underscore_name }}()
 

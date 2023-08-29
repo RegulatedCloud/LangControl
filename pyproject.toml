@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "LangController"
-version = "0.1.2"
+version = "0.1.1"
 description = "A Framework for LLM Applications. Inspired by Django, Laravel, and Meltano."
 authors = ["Jacob Silva <jacob.silva@regulated.cloud>"]
 readme = "README.md"
@@ -12,8 +12,14 @@ langcontroller = "langcontroller:app"
 [tool.poetry.dependencies]
 python = "^3.10"
 jinja2 = "^3.1.2"
-typer = { extras = ["all"], version = "^0.9.0" }
+loguru = "^0.7.0"
+opentelemetry-api = "^1.19.0"
+opentelemetry-distro = "^0.40b0"
+opentelemetry-exporter-otlp = "^1.19.0"
+opentelemetry-instrumentation-fastapi = "^0.40b0"
+opentelemetry-sdk = "^1.19.0"
 python-slugify = "^8.0.1"
+typer = { extras = ["all"], version = "^0.9.0" }
 
 [tool.poetry.group.llama.dependencies]
 llama-index = "^0.8.12"

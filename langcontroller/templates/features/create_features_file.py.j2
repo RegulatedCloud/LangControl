@@ -27,9 +27,11 @@ Patterns:
 """
 import typer
 from fastapi import FastAPI
-from rich import print
+from loguru import logger
 from langcontroller.processors import *
 from app.models import *
+
+logger.add("logs/app/features.log", rotation="10 MB")
 
 api_app = FastAPI()
 

@@ -1,4 +1,4 @@
 """LangController Controllers."""
-from langcontroller.processors.base import *
-from langcontroller.processors.llama import *
-from langcontroller.processors.marvin import *
+from langcontroller.processors.base import StructuredLLMOutputBase
+from langcontroller.processors.llama import LlamaStructuredLLMOutput
+from langcontroller.processors.marvin import MarvinStructuredLLMOutput
