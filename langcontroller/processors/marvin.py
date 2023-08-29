@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 import pydantic
 
-from langcontroller.controllers.base import (
+from langcontroller.processors.base import (
     StructuredLLMOutputBase,
     OutputModel,
 )
@@ -24,7 +24,7 @@ class MarvinStructuredLLMOutput(StructuredLLMOutputBase):
             **kwargs: The context to apply to the jinja2 template for the llm prompt_template
 
         Returns:
-            pydantic.main.ModelMetaclass: The output model
+            `pydantic.main.ModelMetaclass`: The output model
         """
         prompt = self.get_rendered_prompt(
             prompt_template=self.prompt_template, **kwargs

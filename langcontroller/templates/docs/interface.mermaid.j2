@@ -1,0 +1,11 @@
+---
+title: "Interface Diagram"
+---
+flowchart TB
+    subgraph Interfaces
+        direction TB
+        API[API\n___\nFastAPI]
+        CLI[CLI\n___\nTyper]
+        Pipeline[Pipeline\n___\nDagster]
+    end
+    Interfaces -- Request --> Feature

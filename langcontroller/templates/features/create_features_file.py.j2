@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""{{ project_nmae }}Feature Service Repository.
+"""{{ project_name }} Feature Service Repository.
 
 This module contains the repository of feature services for the Scaled Agile Framework project.
 
@@ -13,14 +13,22 @@ Patterns:
     - Command-Pattern
     - Strategy-Pattern
 
+<hr />
+<center>
+```mermaid
+.. include:: ../docs/diagrams/interface.mermaid
+```
+<hr />
 ```mermaid
 .. include:: ../docs/diagrams/dataflow.mermaid
 ```
+</center>
+<hr />
 """
 import typer
 from fastapi import FastAPI
 from rich import print
-from langcontroller.controllers import *
+from langcontroller.processors import *
 from app.models import *
 
 api_app = FastAPI()

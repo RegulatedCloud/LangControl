@@ -10,7 +10,7 @@ Features:
 
 Template Naming Conventions:
     <domain>_<operation>_<data_type>
-    domain - manage|models|pipeline|prompt_templates|pyproject|repository
+    domain - manage|models|pipeline|prompt_templates|pyproject|features
     operation - append|create
     data_type - asset|class|function|file|prompt|sensor
 """
@@ -121,8 +121,8 @@ class MAKE:
         )
 
         template_writer.render_and_write(
-            template_file="repository/create_repository_file.py.j2",
-            output_file=f"{project.python_name()}/app/repository.py",
+            template_file="features/create_features_file.py.j2",
+            output_file=f"{project.python_name()}/app/features.py",
             context=dict(project_name=project.human_name()),
         )
 
@@ -136,6 +136,12 @@ class MAKE:
             template_file="pipeline/create_pipeline_file.py.j2",
             output_file=f"{project.python_name()}/app/pipeline.py",
             context=dict(project_name=project.human_name()),
+        )
+
+        template_writer.render_and_write(
+            template_file="docs/interface.mermaid.j2",
+            output_file=f"{project.python_name()}/docs/diagrams/interface.mermaid",
+            context=dict(),
         )
 
         template_writer.render_and_write(
@@ -164,7 +170,7 @@ class MAKE:
             [
                 os.path.exists("app/models.py"),
                 os.path.exists("app/pipeline.py"),
-                os.path.exists("app/repository.py"),
+                os.path.exists("app/features.py"),
                 os.path.exists("manage.py"),
                 os.path.exists("templates"),
             ]
@@ -203,8 +209,8 @@ class MAKE:
         )
 
         template_writer.render_and_write(
-            template_file="repository/append_sensor_class.py.j2",
-            output_file="app/repository.py",
+            template_file="features/append_sensor_class.py.j2",
+            output_file="app/features.py",
             context=dict(
                 target_action_human_name=target_action.human_name(),
                 target_action_python_name=target_action.python_name(),
@@ -252,7 +258,7 @@ class MAKE:
             [
                 os.path.exists("app/models.py"),
                 os.path.exists("app/pipeline.py"),
-                os.path.exists("app/repository.py"),
+                os.path.exists("app/features.py"),
                 os.path.exists("templates"),
                 os.path.exists("manage.py"),
             ]
@@ -296,10 +302,11 @@ class MAKE:
         )
 
         template_writer.render_and_write(
-            template_file="repository/append_asset_class.py.j2",
-            output_file="app/repository.py",
+            template_file="features/append_asset_class.py.j2",
+            output_file="app/features.py",
             context=dict(
                 source_action_underscore_name=source_action.underscore_name(),
+                source_action_python_name=source_action.python_name(),
                 target_action_human_name=target_action.human_name(),
                 target_action_python_name=target_action.python_name(),
                 target_action_underscore_name=target_action.underscore_name(),
