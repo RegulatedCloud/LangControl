@@ -1,27 +1,30 @@
-"""Marvin Structured Output Strategy.
+"""Marvin Controller Module.
 
-MarvinAI specific Strategy for submitting prompts to Marvin
+This module contains the MarvinController class, which is a subclass of
+the LangController class.
 """
 from dataclasses import dataclass
 
-from langcontroller.controllers.structs import OutputModel
-from langcontroller.controllers.generic import (
-    StructuredOutputStrategy,
+import pydantic
+
+from langcontroller.controllers.base import (
+    StructuredLLMOutputBase,
+    OutputModel,
 )
 
 
 @dataclass
-class MarvinStructuredOutputStrategy(StructuredOutputStrategy):
-    """A MarvinAI specific Mixin for structured output."""
+class MarvinStructuredLLMOutput(StructuredLLMOutputBase):
+    """Marvin Structured LLM Output."""
 
     def apply(self, **kwargs) -> OutputModel:
-        """Apply prompt_template then output model.
+        """Apply prompt_template then output pydantic model.
 
         Args:
             **kwargs: The context to apply to the jinja2 template for the llm prompt_template
 
         Returns:
-            OutputModel: The populated structured output model based on Pydantic
+            pydantic.main.ModelMetaclass: The output model
         """
         prompt = self.get_rendered_prompt(
             prompt_template=self.prompt_template, **kwargs

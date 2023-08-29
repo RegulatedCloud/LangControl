@@ -5,19 +5,17 @@ from unittest.mock import patch, Mock
 
 
 class StrategyCreationTestCase(unittest.TestCase):
-    def test_strategy_creation_returns_expected_content(self):
-        with patch(
-                "dagster.AssetExecutionContext"
-        ) as mock_asset_execution_context, patch(
-            "app.pipeline.create_strategy"
-        ) as mock_create_strategy:
+    @patch("dagster.AssetExecutionContext")
+    def test_strategy_creation_returns_expected_content(self, mock_asset_execution_context):
+        with patch("app.pipeline.create_strategy") as mock_create_strategy:
             expected_content = dict(content="Test Content")
 
-            mock_response = Mock()
-            mock_response.dict.return_value = expected_content
+            mock_strategy_response = Mock()
+            mock_strategy_response.dict.return_value = expected_content
 
-            mock_create_strategy.side_effect = [mock_response]
+            mock_create_strategy.side_effect = [mock_strategy_response]
 
             actual_strategy_result = strategy(context=mock_asset_execution_context)
             self.assertEqual(actual_strategy_result, str(expected_content))
             mock_create_strategy.assert_called_once()
+

@@ -1,22 +1,23 @@
-"""Structured Output Strategy Abstract Base Class.
+"""LangController Base Classes.
 
-This module contains the Structured Output Strategy Abstract Base Class.
+This module contains the base classes of the LangController project.
 """
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Callable
+from typing import Callable, TypeVar, Any
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from langcontroller.controllers import OutputModel
+OutputModel = TypeVar("OutputModel")
+OutputModelStrategy = Callable[[Any], OutputModel]
 
 
 @dataclass
-class StructuredOutputStrategy(ABC):
+class StructuredLLMOutputBase(ABC):
     """Structured Output Strategy Abstract Base Class."""
 
+    output_model: OutputModelStrategy
     prompt_template: str = field(default="")
-    output_model: Callable[[str], OutputModel] = field(default_factory=OutputModel)
 
     @abstractmethod
     def apply(self, **kwargs) -> OutputModel:

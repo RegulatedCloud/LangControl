@@ -1,0 +1,27 @@
+---
+title: "Data Flow Architecture"
+---
+flowchart LR
+    Request -- Raw Text --> FeatureService -- Safe Response --> Response
+    PromptProcessor("Prompt Processor") -- Safe Text --> StructuredLLMOutput
+
+    subgraph FeatureService["Feature Service"]
+        direction LR
+        SecurityMiddlewarePre --> PromptTemplate --> SecurityMiddlewarePost
+        subgraph PromptProcessor["Prompt Processor"]
+            direction TB
+            PromptTemplate["Render Template"]
+            SecurityMiddlewarePre["Security Middleware Pre-Template"]
+            SecurityMiddlewarePost["Security Middleware Post-Template"]
+        end
+
+        InputModel --> LLMProcessor --> OutputModel
+        subgraph StructuredLLMOutput["Safe A.I."]
+            direction TB
+            InputModel["Input Model"]
+            LLMProcessor["LLM Processor"]
+            OutputModel["Output Model"]
+        end
+
+    end
+

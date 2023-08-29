@@ -58,6 +58,9 @@ class MAKE:
         with open(f"{project.python_name()}/templates/__init__.py", "w") as my_file:
             my_file.write(f'"""{project.human_name()} Templates."""\n')
 
+        os.mkdir(f"{project.python_name()}/docs")
+        os.mkdir(f"{project.python_name()}/docs/diagrams")
+
     @staticmethod
     def do_project(project_name: str):
         """Create a new LangController Project.
@@ -133,6 +136,12 @@ class MAKE:
             template_file="pipeline/create_pipeline_file.py.j2",
             output_file=f"{project.python_name()}/app/pipeline.py",
             context=dict(project_name=project.human_name()),
+        )
+
+        template_writer.render_and_write(
+            template_file="docs/dataflow.mermaid.j2",
+            output_file=f"{project.python_name()}/docs/diagrams/dataflow.mermaid",
+            context=dict(),
         )
 
     @staticmethod

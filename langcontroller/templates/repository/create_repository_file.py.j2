@@ -1,16 +1,21 @@
-"""{{ project_name }} Repository Services.
+# -*- coding: utf-8 -*-
+"""{{ project_nmae }}Feature Service Repository.
 
-This module contains the important repository services of the {{ project_name }} project,
-such as the FastAPI application and the CLI application.
+This module contains the repository of feature services for the Scaled Agile Framework project.
 
-Components wrap the controllers and models, and are used to provide a clean
-interface to the developer.
+Feature Services:
+    - wrap processors and models
+    - are used to provide a clean interface to the developer
 
 Patterns:
-    Decorator-Pattern
-    Service-Pattern
-    Command-Pattern
-    Strategy-Pattern
+    - Decorator-Pattern
+    - Service-Pattern
+    - Command-Pattern
+    - Strategy-Pattern
+
+```mermaid
+.. include:: ../docs/diagrams/dataflow.mermaid
+```
 """
 import typer
 from fastapi import FastAPI

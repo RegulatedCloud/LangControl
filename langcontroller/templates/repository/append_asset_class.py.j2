@@ -1,12 +1,28 @@
-@api_app.post("{{ target_action_underscore_name }}")
+@api_app.post("/{{ target_action_underscore_name }}")
 @cli_app.command()
 def create_{{ target_action_underscore_name }}(
     {{ source_action_underscore_name }}: str,
 ) -> {{ target_action_python_name }}:
-    """Creates a {{ target_action_human_name }}."""
+    r"""Creates a {{ target_action_human_name }}.
+
+    ```mermaid
+    flowchart LR
+        Input --> Processor --> Output
+
+        Input["Input Model\n___\napp.models.{{ source_action_python_name }}"]
+        Processor("LLM Processor\n___\nlangcontroller.controllers.marvin.MarvinStructuredLLMOutput")
+        Output["Output Model\n___\napp.models.{{ target_action_python_name }}"]
+    ```
+
+    Args:
+        {{ source_action_underscore_name }} (str): The str of `app.models.{{ source_action_python_name }}
+
+    Returns:
+        `app.models.{{ target_action_python_name }}`: The {{ target_action_human_name }}
+    """
     print("Creating {{ target_action_human_name }}...")
 
-    model: {{ target_action_python_name }} = {{ controller_type }}StructuredOutputController(
+    model: {{ target_action_python_name }} = {{ controller_type }}StructuredLLMOutput(
         prompt_template="{{ prompt_name }}",
         output_model={{ target_action_python_name }},
     ).apply(content={{ source_action_underscore_name }})
